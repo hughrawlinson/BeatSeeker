@@ -3,7 +3,7 @@
 
   var targetChannel = null;
   var userChannel = null;
-  var accuracy = 0.05;
+  var accuracy = 0.0005;
 
   var euclideanDistance = function(a,b){
     if(a.length != b.length){
@@ -81,7 +81,7 @@
     var startSoundButton = document.createElement('button');
     startSoundButton.appendChild(document.createTextNode('Start'));
     var targetSound = [0,0,0];
-    resetTargetChannelParametersButton.addEventListener("click",resetTargetChannel);
+    resetTargetChannelParametersButton.addEventListener("click",function(){resetTargetChannel();});
     startSoundButton.addEventListener("click",function(){
       if(targetChannel){
         targetChannel.stop();
@@ -105,7 +105,9 @@
         window.addEventListener("deviceorientation", function () {
           var npv = normaliseOrientation([event.alpha,event.beta, event.gamma]);
           console.log(npv);
-          if(npv[0] > targetSound[0]-accuracy && npv[0] < targetSound[0]+accuracy)
+          if(Math.abs(npv[0]-targetSound[0]) < accuracy){
+            resetTargetChannel();
+          }
           userChannel.applyNormalisedParameterVector(npv);
           displayRanges.alpha.value = event.alpha;
           displayRanges.beta.value = event.beta;
@@ -118,6 +120,6 @@
     var resetTargetChannel = function(){
       targetSound = randomNormalisedVec3();
       targetChannel.applyNormalisedParameterVector(targetSound);
-    }
+    };
   });
 })();
